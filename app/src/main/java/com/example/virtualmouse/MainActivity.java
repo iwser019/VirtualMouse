@@ -35,20 +35,25 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private EditText edit;
     private LinearLayout pad;
 
+    private Button btnLeft, btnMid, btnRight;
+
     private float curX, curY;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        curX = 500.0f;
-        curY = 500.0f;
+        curX = 0.0f;
+        curY = 0.0f;
         sensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
         sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         mAccel = 0.00f;
         mAccelCurrent = SensorManager.GRAVITY_EARTH;
         mAccelLast = SensorManager.GRAVITY_EARTH;
         btnSetip = findViewById(R.id.setip);
+        btnLeft = findViewById(R.id.button_lmb);
+        btnMid = findViewById(R.id.button_mmb);
+        btnRight = findViewById(R.id.button_right);
         edit = findViewById(R.id.edit);
         pad = findViewById(R.id.layout_pad);
         pad.setOnTouchListener(new View.OnTouchListener() {
@@ -94,6 +99,32 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 }
             }
         });
+        btnLeft.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                try {
+                    if (out != null) {
+                        out.println(String.format(Locale.ROOT, "l %d %d", (int) curX, (int) curY));
+                        out.flush();
+                    }
+                } catch (Exception exc) {
+                    exc.printStackTrace();
+                }
+            }
+        });
+        btnRight.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                try {
+                    if (out != null) {
+                        out.println(String.format(Locale.ROOT, "r %d %d", (int) curX, (int) curY));
+                        out.flush();
+                    }
+                } catch (Exception exc) {
+                    exc.printStackTrace();
+                }
+            }
+        });
         netThread.start();
 
     }
@@ -120,8 +151,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             mAccelCurrent = (float) Math.sqrt(x*x + y*y + z*z);
             float delta = mAccelCurrent - mAccelLast;
             mAccel = mAccel * 0.9f + delta;
-            curX += x;
-            curY += y;
+            curX = x;
+            curY = y;
 // Make this higher or lower according to how much
 // motion you want to detect
             if(mAccel > 0.01){
